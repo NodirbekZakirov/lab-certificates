@@ -123,11 +123,13 @@ export async function POST(request: NextRequest) {
           doc.on('data', (chunk) => chunks.push(chunk));
           doc.on('end', () => resolve(Buffer.concat(chunks)));
           
-          // PDFKit does not support Cyrillic characters out of the box with standard fonts.
-          // For a production app, we would load a custom TTF font like Roboto.
-          // To ensure this doesn't crash or show gibberish, we will use default fonts but
-          // standard PDF fonts might not render Russian properly. 
-          // We'll use a hack to just write simple text. A real implementation should register a font.
+          // Register Roboto font to support Cyrillic characters
+          const fs = require('fs');
+          const path = require('path');
+          const fontPath = path.join(process.cwd(), 'public', 'fonts', 'Roboto-Regular.ttf');
+          if (fs.existsSync(fontPath)) {
+            doc.font(fontPath);
+          }
           
           doc.fontSize(18).text(title, { align: 'center' });
           doc.moveDown();
