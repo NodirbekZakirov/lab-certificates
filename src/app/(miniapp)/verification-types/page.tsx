@@ -64,94 +64,96 @@ export default function VerificationTypesPage() {
   }
 
   return (
-    <div className="animate-fade-in">
-      <div className="p-5 pb-2">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-text-secondary hover:text-accent transition-colors mb-5 bg-bg-secondary px-4 py-2 rounded-xl border border-border w-fit active:scale-95"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="m15 18-6-6 6-6" />
-          </svg>
-          <span className="text-[13px] font-bold tracking-wide uppercase">{t.app.back}</span>
-        </Link>
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold gradient-text tracking-tight">
-            {t.verificationTypes.title}
-          </h1>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="btn-secondary text-[13px] px-4 py-2 rounded-xl border border-border shadow-sm active:scale-95"
+    <>
+      <div className="animate-fade-in">
+        <div className="p-5 pb-2">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-text-secondary hover:text-accent transition-colors mb-5 bg-bg-secondary px-4 py-2 rounded-xl border border-border w-fit active:scale-95 shadow-sm"
           >
-            {showForm ? t.app.cancel : t.verificationTypes.addNew}
-          </button>
-        </div>
-      </div>
-
-      {successMessage && (
-        <div className="mx-5 mb-5 p-3 rounded-xl bg-status-green-bg border border-status-green/30 animate-slide-up shadow-sm">
-          <p className="text-sm text-status-green text-center font-bold tracking-wide">{successMessage}</p>
-        </div>
-      )}
-
-      {showForm && (
-        <form onSubmit={handleSubmit} className="mx-5 mb-6 glass-card p-5 space-y-4 animate-slide-up">
-          <div>
-            <label className="block text-[13px] font-semibold text-text-muted mb-2 ml-1">{t.verificationTypes.nameRu}</label>
-            <input
-              type="text"
-              className="input-field"
-              value={nameRu}
-              onChange={(e) => setNameRu(e.target.value)}
-              placeholder={t.verificationTypes.nameRuPlaceholder}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-[13px] font-semibold text-text-muted mb-2 ml-1">{t.verificationTypes.nameUz}</label>
-            <input
-              type="text"
-              className="input-field"
-              value={nameUz}
-              onChange={(e) => setNameUz(e.target.value)}
-              placeholder={t.verificationTypes.nameUzPlaceholder}
-              required
-            />
-          </div>
-          <button type="submit" className="btn-primary w-full mt-2" disabled={saving}>
-            {saving ? t.app.loading : t.app.add}
-          </button>
-        </form>
-      )}
-
-      <div className="px-5 space-y-4 pb-28 responsive-grid">
-        {types.length === 0 ? (
-          <div className="glass-card p-10 text-center animate-fade-in border-dashed">
-            <p className="text-text-secondary font-medium">{t.verificationTypes.empty}</p>
-          </div>
-        ) : (
-          types.map((type, index) => (
-            <div
-              key={type.id}
-              className="glass-card p-5 animate-slide-up hover:scale-[1.02] transition-transform cursor-default"
-              style={{ animationDelay: `${Math.min(index * 50, 500)}ms` }}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+            <span className="text-[13px] font-bold tracking-wide uppercase">{t.app.back}</span>
+          </Link>
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-2xl font-bold gradient-text tracking-tight">
+              {t.verificationTypes.title}
+            </h1>
+            <button
+              onClick={() => setShowForm(!showForm)}
+              className="btn-secondary text-[13px] px-4 py-2 rounded-xl border border-border shadow-sm active:scale-95"
             >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-bg-secondary flex items-center justify-center text-accent font-bold text-[15px] border border-border shadow-inner">
-                  {type.sortOrder}
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-[15px] font-bold text-text-primary tracking-tight">
-                    {language === 'uz' ? type.nameUz : type.nameRu}
-                  </h3>
-                  <p className="text-[13px] text-text-muted font-medium mt-0.5">
-                    {language === 'uz' ? type.nameRu : type.nameUz}
-                  </p>
+              {showForm ? t.app.cancel : t.verificationTypes.addNew}
+            </button>
+          </div>
+        </div>
+
+        {successMessage && (
+          <div className="mx-5 mb-5 p-3 rounded-xl bg-status-green-bg border border-status-green/30 animate-slide-up shadow-sm">
+            <p className="text-sm text-status-green text-center font-bold tracking-wide">{successMessage}</p>
+          </div>
+        )}
+
+        {showForm && (
+          <form onSubmit={handleSubmit} className="mx-5 mb-6 glass-card p-5 space-y-4 animate-slide-up">
+            <div>
+              <label className="block text-[13px] font-semibold text-text-muted mb-2 ml-1">{t.verificationTypes.nameRu}</label>
+              <input
+                type="text"
+                className="input-field"
+                value={nameRu}
+                onChange={(e) => setNameRu(e.target.value)}
+                placeholder={t.verificationTypes.nameRuPlaceholder}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-[13px] font-semibold text-text-muted mb-2 ml-1">{t.verificationTypes.nameUz}</label>
+              <input
+                type="text"
+                className="input-field"
+                value={nameUz}
+                onChange={(e) => setNameUz(e.target.value)}
+                placeholder={t.verificationTypes.nameUzPlaceholder}
+                required
+              />
+            </div>
+            <button type="submit" className="btn-primary w-full mt-2" disabled={saving}>
+              {saving ? t.app.loading : t.app.add}
+            </button>
+          </form>
+        )}
+
+        <div className="px-5 space-y-4 pb-28 responsive-grid">
+          {types.length === 0 ? (
+            <div className="glass-card p-10 text-center animate-fade-in border-dashed">
+              <p className="text-text-secondary font-medium">{t.verificationTypes.empty}</p>
+            </div>
+          ) : (
+            types.map((type, index) => (
+              <div
+                key={type.id}
+                className="glass-card p-5 animate-slide-up hover:scale-[1.02] transition-transform cursor-default"
+                style={{ animationDelay: `${Math.min(index * 50, 500)}ms` }}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-bg-secondary flex items-center justify-center text-accent font-bold text-[15px] border border-border shadow-inner">
+                    {type.sortOrder}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-[15px] font-bold text-text-primary tracking-tight">
+                      {language === 'uz' ? type.nameUz : type.nameRu}
+                    </h3>
+                    <p className="text-[13px] text-text-muted font-medium mt-0.5">
+                      {language === 'uz' ? type.nameRu : type.nameUz}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
-        )}
+            ))
+          )}
+        </div>
       </div>
 
       <nav className="nav-dock-container">
@@ -177,6 +179,6 @@ export default function VerificationTypesPage() {
           </Link>
         </div>
       </nav>
-    </div>
+    </>
   );
 }

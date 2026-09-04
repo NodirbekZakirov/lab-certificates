@@ -73,98 +73,100 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="animate-fade-in">
-      <div className="p-5 pb-2">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-text-secondary hover:text-accent transition-colors mb-5 bg-bg-secondary px-4 py-2 rounded-xl border border-border w-fit active:scale-95"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="m15 18-6-6 6-6" />
-          </svg>
-          <span className="text-[13px] font-bold tracking-wide uppercase">{t.app.back}</span>
-        </Link>
-        <h1 className="text-2xl font-bold gradient-text tracking-tight mb-2">
-          {t.settings.title}
-        </h1>
-      </div>
-
-      {successMessage && (
-        <div className="mx-5 mb-5 p-3 rounded-xl bg-status-green-bg border border-status-green/30 animate-slide-up shadow-sm">
-          <p className="text-sm text-status-green text-center font-bold tracking-wide">{successMessage}</p>
-        </div>
-      )}
-
-      <div className="px-5 space-y-5 pb-28 responsive-grid">
-        {/* Language */}
-        <div className="glass-card p-6 animate-slide-up delay-100">
-          <div className="flex flex-col gap-4">
-            <div>
-              <h3 className="text-[15px] font-bold text-text-primary tracking-tight">{t.settings.language}</h3>
-              <p className="text-xs text-text-muted mt-1 font-medium">
-                {language === 'ru' ? 'Русский' : "O'zbekcha"}
-              </p>
-            </div>
-            <div className="lang-switch w-full">
-              <button
-                className={`flex-1 ${language === 'ru' ? 'active' : ''}`}
-                onClick={() => handleLanguageChange('ru')}
-              >
-                RU
-              </button>
-              <button
-                className={`flex-1 ${language === 'uz' ? 'active' : ''}`}
-                onClick={() => handleLanguageChange('uz')}
-              >
-                UZ
-              </button>
-            </div>
-          </div>
+    <>
+      <div className="animate-fade-in">
+        <div className="p-5 pb-2">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-text-secondary hover:text-accent transition-colors mb-5 bg-bg-secondary px-4 py-2 rounded-xl border border-border w-fit active:scale-95"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+            <span className="text-[13px] font-bold tracking-wide uppercase">{t.app.back}</span>
+          </Link>
+          <h1 className="text-2xl font-bold gradient-text tracking-tight mb-2">
+            {t.settings.title}
+          </h1>
         </div>
 
-        {/* Notifications */}
-        <div className="glass-card p-6 animate-slide-up delay-200">
-          <div className="flex items-center justify-between">
-            <div className="pr-4">
-              <h3 className="text-[15px] font-bold text-text-primary tracking-tight">{t.settings.notifications}</h3>
-              <p className="text-xs text-text-muted mt-1 font-medium leading-relaxed">
-                {user?.notificationsEnabled ? t.settings.notificationsOn : t.settings.notificationsOff}
-              </p>
-            </div>
-            <button
-              className={`toggle-switch shrink-0 ${user?.notificationsEnabled ? 'active' : ''}`}
-              onClick={handleNotificationsToggle}
-              disabled={saving}
-            />
-          </div>
-        </div>
-
-        {/* User info */}
-        {user && (
-          <div className="glass-card p-6 animate-slide-up delay-300">
-            <h3 className="text-[15px] font-bold text-text-primary tracking-tight mb-4">
-              {language === 'uz' ? "Foydalanuvchi ma'lumotlari" : 'Информация'}
-            </h3>
-            <div className="space-y-3 text-[13px]">
-              <div className="flex justify-between items-center pb-3 border-b border-border/50">
-                <span className="text-text-muted font-medium">Telegram ID</span>
-                <span className="text-text-secondary font-mono bg-bg-secondary px-2 py-1 rounded-md">{user.telegramId}</span>
-              </div>
-              {user.firstName && (
-                <div className="flex justify-between items-center pb-3 border-b border-border/50">
-                  <span className="text-text-muted font-medium">{language === 'uz' ? 'Ism' : 'Имя'}</span>
-                  <span className="text-text-secondary font-medium">{user.firstName}</span>
-                </div>
-              )}
-              {user.username && (
-                <div className="flex justify-between items-center">
-                  <span className="text-text-muted font-medium">Username</span>
-                  <span className="text-text-secondary font-medium">@{user.username}</span>
-                </div>
-              )}
-            </div>
+        {successMessage && (
+          <div className="mx-5 mb-5 p-3 rounded-xl bg-status-green-bg border border-status-green/30 animate-slide-up shadow-sm">
+            <p className="text-sm text-status-green text-center font-bold tracking-wide">{successMessage}</p>
           </div>
         )}
+
+        <div className="px-5 space-y-5 pb-28 responsive-grid">
+          {/* Language */}
+          <div className="glass-card p-6 animate-slide-up delay-100">
+            <div className="flex flex-col gap-4">
+              <div>
+                <h3 className="text-[15px] font-bold text-text-primary tracking-tight">{t.settings.language}</h3>
+                <p className="text-xs text-text-muted mt-1 font-medium">
+                  {language === 'ru' ? 'Русский' : "O'zbekcha"}
+                </p>
+              </div>
+              <div className="lang-switch w-full">
+                <button
+                  className={`flex-1 ${language === 'ru' ? 'active' : ''}`}
+                  onClick={() => handleLanguageChange('ru')}
+                >
+                  RU
+                </button>
+                <button
+                  className={`flex-1 ${language === 'uz' ? 'active' : ''}`}
+                  onClick={() => handleLanguageChange('uz')}
+                >
+                  UZ
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Notifications */}
+          <div className="glass-card p-6 animate-slide-up delay-200">
+            <div className="flex items-center justify-between">
+              <div className="pr-4">
+                <h3 className="text-[15px] font-bold text-text-primary tracking-tight">{t.settings.notifications}</h3>
+                <p className="text-xs text-text-muted mt-1 font-medium leading-relaxed">
+                  {user?.notificationsEnabled ? t.settings.notificationsOn : t.settings.notificationsOff}
+                </p>
+              </div>
+              <button
+                className={`toggle-switch shrink-0 ${user?.notificationsEnabled ? 'active' : ''}`}
+                onClick={handleNotificationsToggle}
+                disabled={saving}
+              />
+            </div>
+          </div>
+
+          {/* User info */}
+          {user && (
+            <div className="glass-card p-6 animate-slide-up delay-300">
+              <h3 className="text-[15px] font-bold text-text-primary tracking-tight mb-4">
+                {language === 'uz' ? "Foydalanuvchi ma'lumotlari" : 'Информация'}
+              </h3>
+              <div className="space-y-3 text-[13px]">
+                <div className="flex justify-between items-center pb-3 border-b border-border/50">
+                  <span className="text-text-muted font-medium">Telegram ID</span>
+                  <span className="text-text-secondary font-mono bg-bg-secondary px-2 py-1 rounded-md">{user.telegramId}</span>
+                </div>
+                {user.firstName && (
+                  <div className="flex justify-between items-center pb-3 border-b border-border/50">
+                    <span className="text-text-muted font-medium">{language === 'uz' ? 'Ism' : 'Имя'}</span>
+                    <span className="text-text-secondary font-medium">{user.firstName}</span>
+                  </div>
+                )}
+                {user.username && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-text-muted font-medium">Username</span>
+                    <span className="text-text-secondary font-medium">@{user.username}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Bottom Navigation */}
@@ -191,6 +193,6 @@ export default function SettingsPage() {
           </div>
         </div>
       </nav>
-    </div>
+    </>
   );
 }
