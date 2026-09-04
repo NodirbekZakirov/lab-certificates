@@ -1,0 +1,100 @@
+{
+  "app": {
+    "title": "Сертификаты оборудования",
+    "loading": "Загрузка...",
+    "error": "Произошла ошибка",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "add": "Добавить",
+    "back": "Назад",
+    "search": "Поиск по названию...",
+    "noResults": "Ничего не найдено",
+    "confirm": "Подтвердить"
+  },
+  "access": {
+    "denied": "Доступ ограничен",
+    "deniedMessage": "У вас нет доступа к этому приложению. Обратитесь к администратору лаборатории.",
+    "contact": "Свяжитесь с администратором"
+  },
+  "equipment": {
+    "title": "Оборудование",
+    "addNew": "Добавить прибор",
+    "name": "Название прибора",
+    "namePlaceholder": "Введите название прибора",
+    "verificationType": "Тип проверки",
+    "certificateNumber": "Номер сертификата",
+    "certificateNumberPlaceholder": "Введите номер сертификата (необязательно)",
+    "expiryDate": "Срок действия сертификата",
+    "certificateFile": "Файл сертификата",
+    "uploadFile": "Загрузить файл",
+    "uploadPhoto": "Фото или PDF",
+    "changeFile": "Заменить файл",
+    "noFile": "Файл не загружен",
+    "daysLeft": "дн. осталось",
+    "daysLeft_one": "{count} день",
+    "daysLeft_few": "{count} дня",
+    "daysLeft_many": "{count} дней",
+    "expired": "Просрочен",
+    "expiredDays": "Просрочено на {count} дн.",
+    "today": "Истекает сегодня",
+    "updateCertificate": "Обновить сертификат",
+    "certificateHistory": "История сертификатов",
+    "noCertificates": "Нет приборов",
+    "created": "Прибор добавлен",
+    "updated": "Сертификат обновлён",
+    "allEquipment": "Все приборы",
+    "expiring": "Истекающие",
+    "overdue": "Просроченные",
+    "viewCertificate": "Просмотреть сертификат",
+    "downloadCertificate": "Скачать сертификат",
+    "replacedAt": "Заменён",
+    "replacedBy": "Кем"
+  },
+  "verificationTypes": {
+    "title": "Типы проверки",
+    "addNew": "Добавить тип проверки",
+    "nameRu": "Название (русский)",
+    "nameUz": "Название (узбекский)",
+    "nameRuPlaceholder": "Введите название на русском",
+    "nameUzPlaceholder": "Введите название на узбекском",
+    "empty": "Нет типов проверки",
+    "created": "Тип проверки добавлен"
+  },
+  "settings": {
+    "title": "Настройки",
+    "language": "Язык интерфейса",
+    "notifications": "Уведомления от бота",
+    "notificationsOn": "Включены",
+    "notificationsOff": "Выключены",
+    "saved": "Настройки сохранены"
+  },
+  "notifications": {
+    "title": "Уведомления",
+    "digestTitle": "📋 Напоминание о сертификатах",
+    "noExpiring": "Нет истекающих сертификатов",
+    "openApp": "Открыть приложение",
+    "expiredSection": "Просроченные",
+    "expiringSection": "Истекающие в ближайшие 30 дней"
+  },
+  "bot": {
+    "welcome": "👋 Добро пожаловать в систему учёта сертификатов лабораторного оборудования!",
+    "welcomeAllowed": "Вы зарегистрированы. Нажмите кнопку ниже, чтобы открыть приложение.",
+    "welcomeNotAllowed": "Вы зарегистрированы, но у вас пока нет доступа. Обратитесь к администратору лаборатории.",
+    "openApp": "📱 Открыть приложение",
+    "expired": "просрочен на {count} дн.",
+    "daysLeft": "осталось {count} дн."
+  },
+  "nav": {
+    "home": "Главная",
+    "settings": "Настройки",
+    "types": "Типы проверки"
+  },
+  "validation": {
+    "required": "Обязательное поле",
+    "invalidDate": "Неверная дата",
+    "fileTooLarge": "Файл слишком большой (макс. 10 МБ)",
+    "invalidFileType": "Допустимые форматы: JPEG, PNG, WebP, PDF"
+  }
+}

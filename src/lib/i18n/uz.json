@@ -1,0 +1,100 @@
+{
+  "app": {
+    "title": "Uskunalar sertifikatlari",
+    "loading": "Yuklanmoqda...",
+    "error": "Xatolik yuz berdi",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "delete": "O'chirish",
+    "edit": "Tahrirlash",
+    "add": "Qo'shish",
+    "back": "Orqaga",
+    "search": "Nomi bo'yicha qidirish...",
+    "noResults": "Hech narsa topilmadi",
+    "confirm": "Tasdiqlash"
+  },
+  "access": {
+    "denied": "Kirish cheklangan",
+    "deniedMessage": "Sizda ushbu ilovaga kirish huquqi yo'q. Laboratoriya administratoriga murojaat qiling.",
+    "contact": "Administrator bilan bog'laning"
+  },
+  "equipment": {
+    "title": "Uskunalar",
+    "addNew": "Uskuna qo'shish",
+    "name": "Uskuna nomi",
+    "namePlaceholder": "Uskuna nomini kiriting",
+    "verificationType": "Tekshirish turi",
+    "certificateNumber": "Sertifikat raqami",
+    "certificateNumberPlaceholder": "Sertifikat raqamini kiriting (ixtiyoriy)",
+    "expiryDate": "Sertifikat amal qilish muddati",
+    "certificateFile": "Sertifikat fayli",
+    "uploadFile": "Fayl yuklash",
+    "uploadPhoto": "Rasm yoki PDF",
+    "changeFile": "Faylni almashtirish",
+    "noFile": "Fayl yuklanmagan",
+    "daysLeft": "kun qoldi",
+    "daysLeft_one": "{count} kun",
+    "daysLeft_few": "{count} kun",
+    "daysLeft_many": "{count} kun",
+    "expired": "Muddati o'tgan",
+    "expiredDays": "{count} kunga muddati o'tgan",
+    "today": "Bugun muddati tugaydi",
+    "updateCertificate": "Sertifikatni yangilash",
+    "certificateHistory": "Sertifikatlar tarixi",
+    "noCertificates": "Uskunalar yo'q",
+    "created": "Uskuna qo'shildi",
+    "updated": "Sertifikat yangilandi",
+    "allEquipment": "Barcha uskunalar",
+    "expiring": "Muddati tugayotgan",
+    "overdue": "Muddati o'tgan",
+    "viewCertificate": "Sertifikatni ko'rish",
+    "downloadCertificate": "Sertifikatni yuklab olish",
+    "replacedAt": "Almashtirilgan",
+    "replacedBy": "Kim tomonidan"
+  },
+  "verificationTypes": {
+    "title": "Tekshirish turlari",
+    "addNew": "Tekshirish turini qo'shish",
+    "nameRu": "Nomi (ruscha)",
+    "nameUz": "Nomi (o'zbekcha)",
+    "nameRuPlaceholder": "Ruscha nomini kiriting",
+    "nameUzPlaceholder": "O'zbekcha nomini kiriting",
+    "empty": "Tekshirish turlari yo'q",
+    "created": "Tekshirish turi qo'shildi"
+  },
+  "settings": {
+    "title": "Sozlamalar",
+    "language": "Interfeys tili",
+    "notifications": "Bot xabarnomalar",
+    "notificationsOn": "Yoqilgan",
+    "notificationsOff": "O'chirilgan",
+    "saved": "Sozlamalar saqlandi"
+  },
+  "notifications": {
+    "title": "Xabarnomalar",
+    "digestTitle": "📋 Sertifikatlar haqida eslatma",
+    "noExpiring": "Muddati tugayotgan sertifikatlar yo'q",
+    "openApp": "Ilovani ochish",
+    "expiredSection": "Muddati o'tgan",
+    "expiringSection": "Yaqin 30 kunda muddati tugaydiganlar"
+  },
+  "bot": {
+    "welcome": "👋 Laboratoriya uskunalari sertifikatlarini hisobga olish tizimiga xush kelibsiz!",
+    "welcomeAllowed": "Siz ro'yxatdan o'tgansiz. Ilovani ochish uchun quyidagi tugmani bosing.",
+    "welcomeNotAllowed": "Siz ro'yxatdan o'tgansiz, lekin sizda hali kirish huquqi yo'q. Laboratoriya administratoriga murojaat qiling.",
+    "openApp": "📱 Ilovani ochish",
+    "expired": "{count} kunga muddati o'tgan",
+    "daysLeft": "{count} kun qoldi"
+  },
+  "nav": {
+    "home": "Bosh sahifa",
+    "settings": "Sozlamalar",
+    "types": "Tekshirish turlari"
+  },
+  "validation": {
+    "required": "Majburiy maydon",
+    "invalidDate": "Noto'g'ri sana",
+    "fileTooLarge": "Fayl juda katta (maks. 10 MB)",
+    "invalidFileType": "Ruxsat etilgan formatlar: JPEG, PNG, WebP, PDF"
+  }
+}
