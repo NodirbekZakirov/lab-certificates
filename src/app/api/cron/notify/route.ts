@@ -7,6 +7,7 @@ import ruMessages from '@/lib/i18n/ru.json';
 import uzMessages from '@/lib/i18n/uz.json';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 // GET /api/cron/notify — ежедневная рассылка уведомлений

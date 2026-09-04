@@ -5,6 +5,7 @@ import { authenticateRequest, requireAllowed, authErrorResponse } from '@/lib/au
 import { eq, desc } from 'drizzle-orm';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 // GET /api/equipment/[id] — карточка одного прибора с историей
 export async function GET(

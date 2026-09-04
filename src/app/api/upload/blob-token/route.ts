@@ -3,6 +3,7 @@ import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { authenticateRequest, requireAllowed } from '@/lib/auth';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 const ALLOWED_CONTENT_TYPES = [
   'image/jpeg',

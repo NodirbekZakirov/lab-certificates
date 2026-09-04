@@ -6,6 +6,9 @@ import { bot, setupBotHandlers } from '@/lib/telegram/bot';
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
 setupBotHandlers(appUrl);
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 const handleUpdate = webhookCallback(bot, 'std/http');
 
 export async function POST(request: NextRequest) {

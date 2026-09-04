@@ -22,6 +22,46 @@ export async function authenticateRequest(
 ): Promise<{ user: AuthenticatedUser } | { error: string; status: number }> {
   const initData = request.headers.get('x-telegram-init-data');
 
+  // В режиме разработки разрешаем тестировать прямо в обычном браузере без Telegram
+  if ((!initData || initData === 'dev-mock') && process.env.NODE_ENV === 'development') {
+    const allowedIds = process.env.INITIAL_ALLOWED_TELEGRAM_IDS?.split(',')
+      .map((id) => parseInt(id.trim(), 10))
+      .filter((id) => !isNaN(id)) ?? [];
+    const devId = allowedIds[0] || 1340447911;
+
+    let user = (
+      await db
+        .select()
+        .from(users)
+        .where(eq(users.telegramId, devId))
+        .limit(1)
+    )[0];
+
+    if (!user) {
+      const [created] = await db
+        .insert(users)
+        .values({
+          telegramId: devId,
+          firstName: 'Admin (Dev)',
+          username: 'admin',
+          isAllowed: true,
+        })
+        .returning();
+      user = created;
+    }
+
+    return {
+      user: {
+        telegramId: user.telegramId,
+        firstName: user.firstName,
+        username: user.username,
+        language: user.language,
+        isAllowed: user.isAllowed,
+        notificationsEnabled: user.notificationsEnabled,
+      },
+    };
+  }
+
   if (!initData) {
     return { error: 'Missing initData', status: 401 };
   }

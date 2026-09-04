@@ -74,11 +74,10 @@ export default function MiniAppLayout({
           }
         }
 
-        // Для разработки: если нет Telegram, используем мок
+        // Для разработки в обычном браузере без Telegram
         if (!tg?.initData && process.env.NODE_ENV === 'development') {
-          console.warn('No Telegram initData found — using development mode');
-          setIsReady(true);
-          return;
+          console.warn('No Telegram initData found — running in development mode');
+          setInitData('dev-mock');
         }
 
         // Загружаем данные пользователя

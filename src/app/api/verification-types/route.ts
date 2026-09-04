@@ -5,6 +5,7 @@ import { authenticateRequest, requireAllowed, authErrorResponse } from '@/lib/au
 import { asc } from 'drizzle-orm';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 // GET /api/verification-types
 export async function GET(request: NextRequest) {

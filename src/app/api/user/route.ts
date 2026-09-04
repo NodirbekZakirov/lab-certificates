@@ -5,6 +5,7 @@ import { authenticateRequest, authErrorResponse } from '@/lib/auth';
 import { eq } from 'drizzle-orm';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 // GET /api/user — данные текущего пользователя
 export async function GET(request: NextRequest) {
