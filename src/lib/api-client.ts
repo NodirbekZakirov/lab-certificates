@@ -135,4 +135,11 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+
+  // Export
+  exportReport: (data: { telegramId: number; format: 'excel' | 'pdf'; language: string }) =>
+    apiFetch<{ success: boolean }>('/api/equipment/export', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
 };

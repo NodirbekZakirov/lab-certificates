@@ -166,6 +166,70 @@ export default function SettingsPage() {
               </div>
             </div>
           )}
+
+          {/* Export Reports */}
+          {user && (
+            <div className="glass-card p-6 animate-slide-up delay-400">
+              <div className="mb-4">
+                <h3 className="text-[15px] font-bold text-text-primary tracking-tight">
+                  {language === 'uz' ? 'Hisobotlar' : 'Отчеты'}
+                </h3>
+                <p className="text-xs text-text-muted mt-1 font-medium leading-relaxed">
+                  {language === 'uz' ? "Hisobot bot orqali yuboriladi" : "Отчет будет отправлен вам в чат с ботом"}
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  className="flex-1 btn-secondary py-3 flex items-center justify-center gap-2 rounded-xl border border-border shadow-sm active:scale-95"
+                  onClick={async () => {
+                    setSaving(true);
+                    try {
+                      await api.exportReport({ telegramId: user.telegramId, format: 'excel', language });
+                      setSuccessMessage(language === 'uz' ? 'Hisobot yuborildi!' : 'Отчет отправлен в чат!');
+                      setTimeout(() => setSuccessMessage(''), 3000);
+                    } catch (e) {
+                      alert('Error exporting');
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                  disabled={saving}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="8" y1="13" x2="16" y2="13"></line>
+                    <line x1="8" y1="17" x2="16" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                  </svg>
+                  <span className="text-[13px] font-bold">Excel</span>
+                </button>
+                <button
+                  className="flex-1 btn-secondary py-3 flex items-center justify-center gap-2 rounded-xl border border-border shadow-sm active:scale-95"
+                  onClick={async () => {
+                    setSaving(true);
+                    try {
+                      await api.exportReport({ telegramId: user.telegramId, format: 'pdf', language });
+                      setSuccessMessage(language === 'uz' ? 'Hisobot yuborildi!' : 'Отчет отправлен в чат!');
+                      setTimeout(() => setSuccessMessage(''), 3000);
+                    } catch (e) {
+                      alert('Error exporting');
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                  disabled={saving}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <path d="M10.42 12.61a2.1 2.1 0 1 1 2.97 2.97L7.95 21 4 22l.99-3.95 5.43-5.44Z"></path>
+                  </svg>
+                  <span className="text-[13px] font-bold">PDF</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
