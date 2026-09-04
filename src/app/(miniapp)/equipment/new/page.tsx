@@ -64,44 +64,44 @@ export default function NewEquipmentPage() {
 
   if (loading) {
     return (
-      <div className="p-4 space-y-4">
-        <div className="skeleton h-8 w-48" />
-        <div className="skeleton h-16 w-full" />
-        <div className="skeleton h-16 w-full" />
+      <div className="p-5 space-y-5">
+        <div className="skeleton h-10 w-48 mb-6" />
+        <div className="skeleton h-20 w-full rounded-2xl" />
+        <div className="skeleton h-20 w-full rounded-2xl" />
       </div>
     );
   }
 
   return (
-    <div className="animate-fade-in">
-      <div className="p-4 pb-0">
+    <div className="animate-fade-in pb-28">
+      <div className="p-5 pb-2">
         <Link
           href="/"
-          className="inline-flex items-center gap-1 text-text-secondary hover:text-accent transition-colors mb-4"
+          className="inline-flex items-center gap-2 text-text-secondary hover:text-accent transition-colors mb-5 bg-bg-secondary px-4 py-2 rounded-xl border border-border w-fit active:scale-95 shadow-sm"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="m15 18-6-6 6-6" />
           </svg>
-          <span className="text-sm">{t.app.back}</span>
+          <span className="text-[13px] font-bold tracking-wide uppercase">{t.app.back}</span>
         </Link>
-        <h1 className="text-lg font-bold gradient-text mb-4">
+        <h1 className="text-2xl font-bold gradient-text tracking-tight mb-4">
           {t.equipment.addNew}
         </h1>
       </div>
 
       {successMessage && (
-        <div className="mx-4 mb-4 p-3 rounded-xl bg-status-green-bg border border-status-green/20">
-          <p className="text-sm text-status-green text-center font-medium">{successMessage}</p>
+        <div className="mx-5 mb-5 p-3 rounded-xl bg-status-green-bg border border-status-green/30 animate-slide-up shadow-sm">
+          <p className="text-sm text-status-green text-center font-bold tracking-wide">{successMessage}</p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="px-4 space-y-4 pb-8">
+      <form onSubmit={handleSubmit} className="px-5 space-y-5 max-w-2xl mx-auto">
         {/* Name */}
-        <div>
-          <label className="block text-xs text-text-muted mb-2">{t.equipment.name}</label>
+        <div className="animate-slide-up delay-100">
+          <label className="block text-[13px] font-semibold text-text-muted mb-2 ml-1 uppercase tracking-wider">{t.equipment.name}</label>
           <input
             type="text"
-            className="input-field"
+            className="input-field shadow-sm"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder={t.equipment.namePlaceholder}
@@ -110,28 +110,35 @@ export default function NewEquipmentPage() {
         </div>
 
         {/* Verification type */}
-        <div>
-          <label className="block text-xs text-text-muted mb-2">{t.equipment.verificationType}</label>
-          <select
-            className="input-field"
-            value={verificationTypeId}
-            onChange={(e) => setVerificationTypeId(e.target.value)}
-            required
-          >
-            {types.map((type) => (
-              <option key={type.id} value={type.id}>
-                {language === 'uz' ? type.nameUz : type.nameRu}
-              </option>
-            ))}
-          </select>
+        <div className="animate-slide-up delay-200">
+          <label className="block text-[13px] font-semibold text-text-muted mb-2 ml-1 uppercase tracking-wider">{t.equipment.verificationType}</label>
+          <div className="relative">
+            <select
+              className="input-field shadow-sm appearance-none pr-10"
+              value={verificationTypeId}
+              onChange={(e) => setVerificationTypeId(e.target.value)}
+              required
+            >
+              {types.map((type) => (
+                <option key={type.id} value={type.id}>
+                  {language === 'uz' ? type.nameUz : type.nameRu}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-text-muted">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+          </div>
         </div>
 
         {/* Certificate number */}
-        <div>
-          <label className="block text-xs text-text-muted mb-2">{t.equipment.certificateNumber}</label>
+        <div className="animate-slide-up delay-300">
+          <label className="block text-[13px] font-semibold text-text-muted mb-2 ml-1 uppercase tracking-wider">{t.equipment.certificateNumber}</label>
           <input
             type="text"
-            className="input-field"
+            className="input-field shadow-sm"
             value={certificateNumber}
             onChange={(e) => setCertificateNumber(e.target.value)}
             placeholder={t.equipment.certificateNumberPlaceholder}
@@ -139,31 +146,40 @@ export default function NewEquipmentPage() {
         </div>
 
         {/* Expiry date */}
-        <div>
-          <label className="block text-xs text-text-muted mb-2">{t.equipment.expiryDate}</label>
+        <div className="animate-slide-up delay-300">
+          <label className="block text-[13px] font-semibold text-text-muted mb-2 ml-1 uppercase tracking-wider">{t.equipment.expiryDate}</label>
           <input
             type="date"
-            className="input-field"
+            className="input-field shadow-sm block w-full"
+            style={{ colorScheme: 'dark' }}
             value={expiryDate}
             onChange={(e) => setExpiryDate(e.target.value)}
             required
           />
         </div>
 
-        <button
-          type="submit"
-          className="btn-primary w-full"
-          disabled={saving || !name || !verificationTypeId || !expiryDate}
-        >
-          {saving ? (
-            <div className="flex items-center justify-center gap-2">
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              {t.app.loading}
-            </div>
-          ) : (
-            t.app.add
-          )}
-        </button>
+        <div className="pt-2 animate-slide-up delay-300">
+          <button
+            type="submit"
+            className="btn-primary w-full shadow-lg"
+            disabled={saving || !name || !verificationTypeId || !expiryDate}
+          >
+            {saving ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                {t.app.loading}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center gap-2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                {t.app.add}
+              </div>
+            )}
+          </button>
+        </div>
       </form>
     </div>
   );

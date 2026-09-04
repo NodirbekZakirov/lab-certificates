@@ -66,8 +66,8 @@ export default function MiniAppLayout({
         if (tg) {
           tg.ready();
           tg.expand();
-          tg.setHeaderColor('#0f0f1a');
-          tg.setBackgroundColor('#0f0f1a');
+          tg.setHeaderColor('#09090b');
+          tg.setBackgroundColor('#09090b');
 
           if (tg.initData) {
             setInitData(tg.initData);
@@ -141,8 +141,10 @@ export default function MiniAppLayout({
 
   return (
     <I18nProvider initialLanguage={(user?.language as 'ru' | 'uz') || 'ru'}>
-      <div className="min-h-screen bg-bg-primary pb-20">
-        {children}
+      <div className="min-h-screen bg-bg-primary">
+        <div className="app-container">
+          {children}
+        </div>
       </div>
     </I18nProvider>
   );

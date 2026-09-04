@@ -64,56 +64,56 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="p-4 space-y-4">
-        <div className="skeleton h-8 w-48" />
-        <div className="skeleton h-24 w-full" />
-        <div className="skeleton h-24 w-full" />
+      <div className="p-5 space-y-5">
+        <div className="skeleton h-10 w-48 mb-6" />
+        <div className="skeleton h-32 w-full rounded-2xl" />
+        <div className="skeleton h-32 w-full rounded-2xl" />
       </div>
     );
   }
 
   return (
     <div className="animate-fade-in">
-      <div className="p-4 pb-0">
+      <div className="p-5 pb-2">
         <Link
           href="/"
-          className="inline-flex items-center gap-1 text-text-secondary hover:text-accent transition-colors mb-4"
+          className="inline-flex items-center gap-2 text-text-secondary hover:text-accent transition-colors mb-5 bg-bg-secondary px-4 py-2 rounded-xl border border-border w-fit active:scale-95"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="m15 18-6-6 6-6" />
           </svg>
-          <span className="text-sm">{t.app.back}</span>
+          <span className="text-[13px] font-bold tracking-wide uppercase">{t.app.back}</span>
         </Link>
-        <h1 className="text-lg font-bold gradient-text mb-4">
+        <h1 className="text-2xl font-bold gradient-text tracking-tight mb-2">
           {t.settings.title}
         </h1>
       </div>
 
       {successMessage && (
-        <div className="mx-4 mb-4 p-3 rounded-xl bg-status-green-bg border border-status-green/20 animate-fade-in">
-          <p className="text-sm text-status-green text-center font-medium">{successMessage}</p>
+        <div className="mx-5 mb-5 p-3 rounded-xl bg-status-green-bg border border-status-green/30 animate-slide-up shadow-sm">
+          <p className="text-sm text-status-green text-center font-bold tracking-wide">{successMessage}</p>
         </div>
       )}
 
-      <div className="px-4 space-y-4 pb-24">
+      <div className="px-5 space-y-5 pb-28 responsive-grid">
         {/* Language */}
-        <div className="glass-card p-5">
-          <div className="flex items-center justify-between">
+        <div className="glass-card p-6 animate-slide-up delay-100">
+          <div className="flex flex-col gap-4">
             <div>
-              <h3 className="text-sm font-semibold text-text-primary">{t.settings.language}</h3>
-              <p className="text-xs text-text-muted mt-1">
+              <h3 className="text-[15px] font-bold text-text-primary tracking-tight">{t.settings.language}</h3>
+              <p className="text-xs text-text-muted mt-1 font-medium">
                 {language === 'ru' ? 'Русский' : "O'zbekcha"}
               </p>
             </div>
-            <div className="lang-switch">
+            <div className="lang-switch w-full">
               <button
-                className={language === 'ru' ? 'active' : ''}
+                className={`flex-1 ${language === 'ru' ? 'active' : ''}`}
                 onClick={() => handleLanguageChange('ru')}
               >
                 RU
               </button>
               <button
-                className={language === 'uz' ? 'active' : ''}
+                className={`flex-1 ${language === 'uz' ? 'active' : ''}`}
                 onClick={() => handleLanguageChange('uz')}
               >
                 UZ
@@ -123,16 +123,16 @@ export default function SettingsPage() {
         </div>
 
         {/* Notifications */}
-        <div className="glass-card p-5">
+        <div className="glass-card p-6 animate-slide-up delay-200">
           <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-sm font-semibold text-text-primary">{t.settings.notifications}</h3>
-              <p className="text-xs text-text-muted mt-1">
+            <div className="pr-4">
+              <h3 className="text-[15px] font-bold text-text-primary tracking-tight">{t.settings.notifications}</h3>
+              <p className="text-xs text-text-muted mt-1 font-medium leading-relaxed">
                 {user?.notificationsEnabled ? t.settings.notificationsOn : t.settings.notificationsOff}
               </p>
             </div>
             <button
-              className={`toggle-switch ${user?.notificationsEnabled ? 'active' : ''}`}
+              className={`toggle-switch shrink-0 ${user?.notificationsEnabled ? 'active' : ''}`}
               onClick={handleNotificationsToggle}
               disabled={saving}
             />
@@ -141,25 +141,25 @@ export default function SettingsPage() {
 
         {/* User info */}
         {user && (
-          <div className="glass-card p-5">
-            <h3 className="text-sm font-semibold text-text-primary mb-3">
+          <div className="glass-card p-6 animate-slide-up delay-300">
+            <h3 className="text-[15px] font-bold text-text-primary tracking-tight mb-4">
               {language === 'uz' ? "Foydalanuvchi ma'lumotlari" : 'Информация'}
             </h3>
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-text-muted">Telegram ID</span>
-                <span className="text-text-secondary font-mono">{user.telegramId}</span>
+            <div className="space-y-3 text-[13px]">
+              <div className="flex justify-between items-center pb-3 border-b border-border/50">
+                <span className="text-text-muted font-medium">Telegram ID</span>
+                <span className="text-text-secondary font-mono bg-bg-secondary px-2 py-1 rounded-md">{user.telegramId}</span>
               </div>
               {user.firstName && (
-                <div className="flex justify-between">
-                  <span className="text-text-muted">{language === 'uz' ? 'Ism' : 'Имя'}</span>
-                  <span className="text-text-secondary">{user.firstName}</span>
+                <div className="flex justify-between items-center pb-3 border-b border-border/50">
+                  <span className="text-text-muted font-medium">{language === 'uz' ? 'Ism' : 'Имя'}</span>
+                  <span className="text-text-secondary font-medium">{user.firstName}</span>
                 </div>
               )}
               {user.username && (
-                <div className="flex justify-between">
-                  <span className="text-text-muted">Username</span>
-                  <span className="text-text-secondary">@{user.username}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-text-muted font-medium">Username</span>
+                  <span className="text-text-secondary font-medium">@{user.username}</span>
                 </div>
               )}
             </div>
@@ -168,28 +168,27 @@ export default function SettingsPage() {
       </div>
 
       {/* Bottom Navigation */}
-      <nav className="nav-bar">
-        <div className="flex justify-around items-center">
-          <Link href="/" className="flex flex-col items-center gap-1 p-2 text-text-muted">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <nav className="nav-dock-container">
+        <div className="nav-dock">
+          <Link href="/" className="nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
             </svg>
-            <span className="text-[10px] font-medium">{t.nav.home}</span>
+            <span className="text-[10px] font-bold tracking-wide">{t.nav.home}</span>
           </Link>
-          <Link href="/verification-types" className="flex flex-col items-center gap-1 p-2 text-text-muted">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-              <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
+          <Link href="/verification-types" className="nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 6h16M4 12h16M4 18h7" />
             </svg>
-            <span className="text-[10px] font-medium">{t.nav.types}</span>
+            <span className="text-[10px] font-bold tracking-wide">{t.nav.types}</span>
           </Link>
-          <Link href="/settings" className="flex flex-col items-center gap-1 p-2 text-accent">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+          <div className="nav-item active">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
             </svg>
-            <span className="text-[10px] font-medium">{t.nav.settings}</span>
-          </Link>
+            <span className="text-[10px] font-bold tracking-wide">{t.nav.settings}</span>
+          </div>
         </div>
       </nav>
     </div>

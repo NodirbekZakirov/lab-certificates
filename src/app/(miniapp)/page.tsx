@@ -27,7 +27,6 @@ export default function HomePage() {
     try {
       const data = await api.getEquipment();
       setEquipment(data);
-      // Expand all groups by default
       const typeIds = new Set(data.map((e) => e.verificationTypeId));
       setExpandedGroups(typeIds);
     } catch (err) {
@@ -43,7 +42,8 @@ export default function HomePage() {
   const grouped = useMemo(() => {
     const filtered = searchQuery
       ? equipment.filter((e) =>
-          e.name.toLowerCase().includes(searchQuery.toLowerCase())
+          e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (e.certificateNumber && e.certificateNumber.toLowerCase().includes(searchQuery.toLowerCase()))
         )
       : equipment;
 
@@ -53,10 +53,7 @@ export default function HomePage() {
       if (!groups.has(item.verificationTypeId)) {
         groups.set(item.verificationTypeId, {
           typeId: item.verificationTypeId,
-          typeName:
-            language === 'uz'
-              ? item.verificationTypeNameUz
-              : item.verificationTypeNameRu,
+          typeName: language === 'uz' ? item.verificationTypeNameUz : item.verificationTypeNameRu,
           items: [],
           isExpanded: expandedGroups.has(item.verificationTypeId),
         });
@@ -73,112 +70,93 @@ export default function HomePage() {
       });
     }
 
-    // Sort items within each group by urgency
     for (const group of groups.values()) {
       group.items.sort((a, b) => a.daysLeft - b.daysLeft);
     }
 
     return Array.from(groups.values()).sort(
-      (a, b) =>
-        (a.items[0]?.verificationTypeSortOrder ?? 0) -
-        (b.items[0]?.verificationTypeSortOrder ?? 0)
+      (a, b) => (a.items[0]?.verificationTypeSortOrder ?? 0) - (b.items[0]?.verificationTypeSortOrder ?? 0)
     );
   }, [equipment, searchQuery, language, expandedGroups]);
 
   const toggleGroup = (typeId: string) => {
     setExpandedGroups((prev) => {
       const next = new Set(prev);
-      if (next.has(typeId)) {
-        next.delete(typeId);
-      } else {
-        next.add(typeId);
-      }
+      if (next.has(typeId)) next.delete(typeId);
+      else next.add(typeId);
       return next;
     });
   };
 
   const stats = useMemo(() => {
-    let expired = 0;
-    let expiring = 0;
-    let ok = 0;
-
+    let expired = 0, expiring = 0, ok = 0;
     for (const item of equipment) {
       const expiryDate = new Date(item.expiryDate);
       expiryDate.setHours(0, 0, 0, 0);
       const diffTime = expiryDate.getTime() - today.getTime();
       const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
       if (daysLeft < 0) expired++;
       else if (daysLeft <= 30) expiring++;
       else ok++;
     }
-
     return { expired, expiring, ok, total: equipment.length };
   }, [equipment]);
 
   if (loading) {
     return (
       <div className="p-4 space-y-4">
-        <div className="skeleton h-24 w-full" />
-        <div className="skeleton h-12 w-full" />
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="skeleton h-20 w-full" />
-        ))}
+        <div className="skeleton h-28 w-full" />
+        <div className="skeleton h-14 w-full" />
+        <div className="responsive-grid">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="skeleton h-24 w-full" />
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
     <div className="animate-fade-in">
-      {/* Header */}
-      <div className="p-4 pb-0">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-bold gradient-text">
-            {t.equipment.title}
-          </h1>
-          <div className="flex gap-2">
-            <Link href="/settings" className="p-2 rounded-xl bg-bg-secondary hover:bg-bg-card transition-colors">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-text-secondary">
-                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-            </Link>
+      <div className="p-5 pb-2">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold gradient-text tracking-tight">
+              {t.equipment.title}
+            </h1>
+            <p className="text-sm text-text-muted mt-1 font-medium">Всего приборов: {stats.total}</p>
+          </div>
+          <Link href="/settings" className="p-2.5 rounded-2xl bg-bg-secondary hover:bg-bg-card-hover border border-border transition-all hover:scale-105 active:scale-95 shadow-sm">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-text-secondary">
+              <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="glass-card p-4 text-center delay-100 animate-fade-in" style={{ borderColor: stats.expired > 0 ? 'rgba(239, 68, 68, 0.3)' : undefined, background: stats.expired > 0 ? 'rgba(239, 68, 68, 0.05)' : undefined }}>
+            <div className={`text-2xl font-bold mb-1 ${stats.expired > 0 ? 'text-status-red' : 'text-text-primary'}`}>{stats.expired}</div>
+            <div className="text-[11px] uppercase tracking-wider font-semibold text-text-muted">{t.equipment.overdue}</div>
+          </div>
+          <div className="glass-card p-4 text-center delay-200 animate-fade-in" style={{ borderColor: stats.expiring > 0 ? 'rgba(245, 158, 11, 0.3)' : undefined, background: stats.expiring > 0 ? 'rgba(245, 158, 11, 0.05)' : undefined }}>
+            <div className={`text-2xl font-bold mb-1 ${stats.expiring > 0 ? 'text-status-yellow' : 'text-text-primary'}`}>{stats.expiring}</div>
+            <div className="text-[11px] uppercase tracking-wider font-semibold text-text-muted">{t.equipment.expiring}</div>
+          </div>
+          <div className="glass-card p-4 text-center delay-300 animate-fade-in">
+            <div className="text-2xl font-bold text-status-green mb-1">{stats.ok}</div>
+            <div className="text-[11px] uppercase tracking-wider font-semibold text-text-muted">ОК</div>
           </div>
         </div>
 
-        {/* Stats cards */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="glass-card p-3 text-center" style={{ borderColor: stats.expired > 0 ? 'rgba(255,23,68,0.3)' : undefined }}>
-            <div className="text-2xl font-bold text-status-red">{stats.expired}</div>
-            <div className="text-xs text-text-muted mt-1">{t.equipment.overdue}</div>
-          </div>
-          <div className="glass-card p-3 text-center" style={{ borderColor: stats.expiring > 0 ? 'rgba(255,214,0,0.3)' : undefined }}>
-            <div className="text-2xl font-bold text-status-yellow">{stats.expiring}</div>
-            <div className="text-xs text-text-muted mt-1">{t.equipment.expiring}</div>
-          </div>
-          <div className="glass-card p-3 text-center">
-            <div className="text-2xl font-bold text-status-green">{stats.ok}</div>
-            <div className="text-xs text-text-muted mt-1">OK</div>
-          </div>
-        </div>
-
-        {/* Search */}
-        <div className="relative mb-4">
-          <svg
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
+        <div className="relative mb-6 animate-slide-up">
+          <svg className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.3-4.3" />
           </svg>
           <input
             type="text"
-            className="input-field pl-10"
+            className="input-field pl-12 h-12 shadow-sm"
             placeholder={t.app.search}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -186,89 +164,79 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Equipment list grouped by verification type */}
-      <div className="px-4 space-y-3 pb-4">
+      <div className="px-5 space-y-6 pb-8">
         {grouped.length === 0 ? (
-          <div className="glass-card p-8 text-center">
-            <div className="text-3xl mb-3">📋</div>
-            <p className="text-text-secondary">{searchQuery ? t.app.noResults : t.equipment.noCertificates}</p>
+          <div className="glass-card p-10 text-center animate-fade-in border-dashed">
+            <div className="w-16 h-16 mx-auto bg-bg-secondary rounded-full flex items-center justify-center mb-4 border border-border">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-text-muted">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+            </div>
+            <p className="text-text-secondary font-medium">{searchQuery ? t.app.noResults : t.equipment.noCertificates}</p>
           </div>
         ) : (
           grouped.map((group) => (
-            <div key={group.typeId} className="glass-card overflow-hidden">
-              {/* Group header */}
+            <div key={group.typeId} className="animate-slide-up">
               <button
-                className="section-header w-full"
+                className="section-header group"
                 onClick={() => toggleGroup(group.typeId)}
               >
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-text-primary">
+                <div className="flex items-center gap-3">
+                  <span className="text-[15px] font-bold text-text-primary group-hover:text-accent transition-colors">
                     {group.typeName}
                   </span>
-                  <span className="text-xs text-text-muted bg-bg-secondary px-2 py-0.5 rounded-full">
+                  <span className="text-xs font-bold text-text-muted bg-bg-secondary px-2.5 py-1 rounded-full border border-border">
                     {group.items.length}
                   </span>
                 </div>
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  className={`text-text-muted transition-transform duration-300 ${
-                    expandedGroups.has(group.typeId) ? 'rotate-180' : ''
-                  }`}
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
+                <div className={`w-8 h-8 rounded-full bg-bg-secondary flex items-center justify-center border border-border transition-all duration-300 ${expandedGroups.has(group.typeId) ? 'rotate-180 bg-accent/10 border-accent/20 text-accent' : 'text-text-muted'}`}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </div>
               </button>
 
-              {/* Items */}
-              {expandedGroups.has(group.typeId) && (
-                <div className="px-3 pb-3 space-y-2 animate-fade-in">
-                  {group.items.map((item) => (
-                    <EquipmentCard key={item.id} item={item} language={language} />
-                  ))}
+              <div className={`grid transition-all duration-300 ease-in-out ${expandedGroups.has(group.typeId) ? 'grid-rows-[1fr] opacity-100 mt-2' : 'grid-rows-[0fr] opacity-0'}`}>
+                <div className="overflow-hidden">
+                  <div className="responsive-grid px-1 pb-2">
+                    {group.items.map((item) => (
+                      <EquipmentCard key={item.id} item={item} language={language} />
+                    ))}
+                  </div>
                 </div>
-              )}
+              </div>
             </div>
           ))
         )}
       </div>
 
-      {/* FAB - Add new equipment */}
       <Link
         href="/equipment/new"
-        className="fixed bottom-24 right-4 w-14 h-14 rounded-full btn-primary flex items-center justify-center shadow-lg animate-pulse-glow z-40"
+        className="fixed bottom-28 right-5 w-14 h-14 rounded-full btn-primary flex items-center justify-center shadow-xl animate-pulse-glow z-40 transition-transform active:scale-90"
       >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <path d="M12 5v14M5 12h14" />
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
       </Link>
 
-      {/* Bottom Navigation */}
-      <nav className="nav-bar">
-        <div className="flex justify-around items-center">
-          <Link href="/" className="flex flex-col items-center gap-1 p-2 text-accent">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <nav className="nav-dock-container">
+        <div className="nav-dock">
+          <Link href="/" className="nav-item active">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
             </svg>
-            <span className="text-[10px] font-medium">{t.nav.home}</span>
+            <span className="text-[10px] font-bold tracking-wide">{t.nav.home}</span>
           </Link>
-          <Link href="/verification-types" className="flex flex-col items-center gap-1 p-2 text-text-muted">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-              <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
+          <Link href="/verification-types" className="nav-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 6h16M4 12h16M4 18h7" />
             </svg>
-            <span className="text-[10px] font-medium">{t.nav.types}</span>
-          </Link>
-          <Link href="/settings" className="flex flex-col items-center gap-1 p-2 text-text-muted">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
-            <span className="text-[10px] font-medium">{t.nav.settings}</span>
+            <span className="text-[10px] font-bold tracking-wide">{t.nav.types}</span>
           </Link>
         </div>
       </nav>
@@ -276,67 +244,62 @@ export default function HomePage() {
   );
 }
 
-function EquipmentCard({
-  item,
-  language,
-}: {
-  item: EquipmentItem & { daysLeft: number };
-  language: string;
-}) {
+function EquipmentCard({ item, language }: { item: EquipmentItem & { daysLeft: number }; language: string }) {
   const { t } = useTranslation();
 
-  let statusClass: string;
-  let statusText: string;
   let dotClass: string;
   let badgeClass: string;
+  let statusText: string;
 
   if (item.daysLeft < 0) {
-    statusClass = 'text-status-red';
     dotClass = 'status-red';
     badgeClass = 'badge-red';
-    statusText = language === 'uz'
-      ? `${Math.abs(item.daysLeft)} kunga muddati o'tgan`
-      : `Просрочено на ${Math.abs(item.daysLeft)} дн.`;
+    statusText = language === 'uz' ? `${Math.abs(item.daysLeft)} kun o'tgan` : `Просрочено на ${Math.abs(item.daysLeft)} дн.`;
   } else if (item.daysLeft === 0) {
-    statusClass = 'text-status-red';
     dotClass = 'status-red';
     badgeClass = 'badge-red';
     statusText = t.equipment.today;
   } else if (item.daysLeft <= 30) {
-    statusClass = 'text-status-yellow';
     dotClass = 'status-yellow';
     badgeClass = 'badge-yellow';
-    statusText = `${item.daysLeft} ${language === 'uz' ? 'kun qoldi' : 'дн.'}`;
+    statusText = `${item.daysLeft} ${language === 'uz' ? 'kun' : 'дн.'}`;
   } else {
-    statusClass = 'text-status-green';
     dotClass = 'status-green';
     badgeClass = 'badge-green';
-    statusText = `${item.daysLeft} ${language === 'uz' ? 'kun qoldi' : 'дн.'}`;
+    statusText = `${item.daysLeft} ${language === 'uz' ? 'kun' : 'дн.'}`;
   }
 
   return (
     <Link
       href={`/equipment/${item.id}`}
-      className="block p-3 rounded-xl bg-bg-primary/50 hover:bg-bg-primary/80 transition-all duration-200 border border-transparent hover:border-accent/20"
+      className="block p-4 rounded-[20px] bg-bg-card hover:bg-bg-card-hover transition-all duration-200 border border-border hover:border-accent/30 hover:shadow-lg active:scale-95"
     >
-      <div className="flex items-start gap-3">
-        <div className="mt-1.5">
+      <div className="flex items-start gap-4">
+        <div className="mt-1 flex-shrink-0">
           <span className={`status-dot ${dotClass}`} />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-medium text-text-primary truncate">
+          <h3 className="text-[15px] font-bold text-text-primary leading-tight line-clamp-2 mb-1">
             {item.name}
           </h3>
-          {item.certificateNumber && (
-            <p className="text-xs text-text-muted mt-0.5 truncate">
-              № {item.certificateNumber}
-            </p>
-          )}
-          <p className="text-xs text-text-muted mt-0.5">
-            {new Date(item.expiryDate).toLocaleDateString('ru-RU')}
-          </p>
+          <div className="flex items-center gap-2 mt-2">
+            {item.certificateNumber && (
+              <span className="text-xs font-mono text-text-secondary bg-bg-secondary px-2 py-0.5 rounded-md border border-border">
+                № {item.certificateNumber}
+              </span>
+            )}
+            <span className="text-xs font-medium text-text-muted flex items-center gap-1">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              {new Date(item.expiryDate).toLocaleDateString('ru-RU')}
+            </span>
+          </div>
         </div>
-        <div className={`badge ${badgeClass} whitespace-nowrap`}>
+        <div className={`badge ${badgeClass} whitespace-nowrap self-start mt-0.5`}>
           {statusText}
         </div>
       </div>
