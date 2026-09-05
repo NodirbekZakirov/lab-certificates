@@ -111,9 +111,9 @@ export async function GET(request: NextRequest) {
       continue;
     }
 
-    // Формируем сводку
+    // Формируем сводку (может быть разбита на несколько частей)
     const t = user.language === 'uz' ? uzMessages : ruMessages;
-    const message = formatDigest(expiringEquipment, today, user.language, t);
+    const chunks = formatDigest(expiringEquipment, today, user.language, t);
 
     try {
       const keyboard = new InlineKeyboard().webApp(
@@ -121,10 +121,16 @@ export async function GET(request: NextRequest) {
         appUrl
       );
 
-      await bot.api.sendMessage(user.telegramId, message, {
-        parse_mode: 'HTML',
-        reply_markup: keyboard,
-      });
+      // Отправляем сообщения по частям
+      for (let i = 0; i < chunks.length; i++) {
+        const options: any = { parse_mode: 'HTML' };
+        // Добавляем кнопку "Открыть приложение" только к последнему сообщению
+        if (i === chunks.length - 1) {
+          options.reply_markup = keyboard;
+        }
+
+        await bot.api.sendMessage(user.telegramId, chunks[i], options);
+      }
 
       userDebug.success = true;
 
@@ -165,9 +171,10 @@ function formatDigest(
   today: string,
   language: string,
   t: typeof ruMessages
-): string {
+): string[] {
   const todayDate = new Date(today);
-  const lines: string[] = [t.notifications.digestTitle, ''];
+  const chunks: string[] = [];
+  let currentChunk = `${t.notifications.digestTitle}\n\n`;
 
   // Группировка по типу проверки
   const grouped = new Map<string, EquipmentItem[]>();
@@ -182,7 +189,7 @@ function formatDigest(
   }
 
   for (const [typeName, typeItems] of grouped) {
-    lines.push(`<b>${typeName}:</b>`);
+    let typeBlock = `<b>${typeName}:</b>\n`;
 
     for (const item of typeItems) {
       const expiryDate = new Date(item.expiryDate);
@@ -217,11 +224,23 @@ function formatDigest(
           : `осталось ${diffDays} дн.`;
       }
 
-      lines.push(`${emoji} ${item.equipmentName} — ${status}`);
+      const line = `${emoji} ${item.equipmentName} — ${status}\n`;
+
+      if (currentChunk.length + typeBlock.length + line.length > 3500) {
+        chunks.push(currentChunk.trim());
+        currentChunk = typeBlock + line;
+        typeBlock = '';
+      } else {
+        typeBlock += line;
+      }
     }
 
-    lines.push('');
+    currentChunk += typeBlock + '\n';
   }
 
-  return lines.join('\n');
+  if (currentChunk.trim().length > 0) {
+    chunks.push(currentChunk.trim());
+  }
+
+  return chunks;
 }
