@@ -84,8 +84,15 @@ export async function GET(request: NextRequest) {
     );
 
   let sentCount = 0;
+  const debugInfo: any = {
+    allowedUsersCount: allowedUsers.length,
+    users: [],
+  };
 
   for (const user of allowedUsers) {
+    const userDebug: any = { telegramId: user.telegramId };
+    debugInfo.users.push(userDebug);
+
     // Проверка: уже отправляли сегодня?
     const alreadySent = await db
       .select()
@@ -98,7 +105,11 @@ export async function GET(request: NextRequest) {
       )
       .limit(1);
 
-    if (alreadySent.length > 0) continue;
+    userDebug.alreadySent = alreadySent.length > 0;
+
+    if (!isTest && alreadySent.length > 0) {
+      continue;
+    }
 
     // Формируем сводку
     const t = user.language === 'uz' ? uzMessages : ruMessages;
@@ -115,14 +126,19 @@ export async function GET(request: NextRequest) {
         reply_markup: keyboard,
       });
 
-      // Записываем отправку
-      await db.insert(sentNotifications).values({
-        telegramId: user.telegramId,
-        notificationDate: today,
-      });
+      userDebug.success = true;
+
+      // Записываем отправку только если не тест или уже не было отправлено
+      if (alreadySent.length === 0) {
+        await db.insert(sentNotifications).values({
+          telegramId: user.telegramId,
+          notificationDate: today,
+        });
+      }
 
       sentCount++;
-    } catch (error) {
+    } catch (error: any) {
+      userDebug.error = error.message || String(error);
       console.error(`Failed to send to ${user.telegramId}:`, error);
     }
   }
@@ -131,6 +147,7 @@ export async function GET(request: NextRequest) {
     message: `Notifications sent`,
     sent: sentCount,
     equipmentCount: expiringEquipment.length,
+    debug: debugInfo,
   });
 }
 
