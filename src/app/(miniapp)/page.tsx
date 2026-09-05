@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from '@/lib/i18n/context';
-import { api, type EquipmentItem } from '@/lib/api-client';
+import { api, type EquipmentItem, type UserData } from '@/lib/api-client';
 import Link from 'next/link';
 
 interface GroupedEquipment {
@@ -12,25 +12,33 @@ interface GroupedEquipment {
   isExpanded: boolean;
 }
 
+type StatusFilter = 'all' | 'valid' | 'expiring' | 'expired';
+
 export default function HomePage() {
   const { t, language } = useTranslation();
   const [equipment, setEquipment] = useState<EquipmentItem[]>([]);
+  const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    loadEquipment();
+    loadData();
   }, []);
 
-  const loadEquipment = async () => {
+  const loadData = async () => {
     try {
-      const data = await api.getEquipment();
-      setEquipment(data);
-      const typeIds = new Set(data.map((e) => e.verificationTypeId));
+      const [equipData, userData] = await Promise.all([
+        api.getEquipment(),
+        api.getUser().catch(() => null)
+      ]);
+      setEquipment(equipData);
+      setUser(userData);
+      const typeIds = new Set(equipData.map((e) => e.verificationTypeId));
       setExpandedGroups(typeIds);
     } catch (err) {
-      console.error('Failed to load equipment:', err);
+      console.error('Failed to load data:', err);
     } finally {
       setLoading(false);
     }
@@ -40,12 +48,26 @@ export default function HomePage() {
   today.setHours(0, 0, 0, 0);
 
   const grouped = useMemo(() => {
-    const filtered = searchQuery
-      ? equipment.filter((e) =>
-          e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (e.certificateNumber && e.certificateNumber.toLowerCase().includes(searchQuery.toLowerCase()))
-        )
-      : equipment;
+    const filtered = equipment.filter((e) => {
+      if (searchQuery) {
+        const match = e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (e.certificateNumber && e.certificateNumber.toLowerCase().includes(searchQuery.toLowerCase()));
+        if (!match) return false;
+      }
+
+      if (statusFilter !== 'all') {
+        const expiryDate = new Date(e.expiryDate);
+        expiryDate.setHours(0, 0, 0, 0);
+        const diffTime = expiryDate.getTime() - today.getTime();
+        const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (statusFilter === 'expired' && daysLeft > 0) return false;
+        if (statusFilter === 'expiring' && (daysLeft <= 0 || daysLeft > 30)) return false;
+        if (statusFilter === 'valid' && daysLeft <= 30) return false;
+      }
+
+      return true;
+    });
 
     const groups = new Map<string, GroupedEquipment>();
 
@@ -77,7 +99,7 @@ export default function HomePage() {
     return Array.from(groups.values()).sort(
       (a, b) => (a.items[0]?.verificationTypeSortOrder ?? 0) - (b.items[0]?.verificationTypeSortOrder ?? 0)
     );
-  }, [equipment, searchQuery, language, expandedGroups]);
+  }, [equipment, searchQuery, statusFilter, language, expandedGroups, today]);
 
   const toggleGroup = (typeId: string) => {
     setExpandedGroups((prev) => {
@@ -100,7 +122,7 @@ export default function HomePage() {
       else ok++;
     }
     return { expired, expiring, ok, total: equipment.length };
-  }, [equipment]);
+  }, [equipment, today]);
 
   if (loading) {
     return (
@@ -150,7 +172,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="relative mb-6 animate-slide-up">
+          <div className="relative mb-4 animate-slide-up">
             <svg className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8" />
               <path d="m21 21-4.3-4.3" />
@@ -162,6 +184,33 @@ export default function HomePage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
+          </div>
+
+          <div className="flex overflow-x-auto gap-2 pb-2 mb-2 scrollbar-hide animate-slide-up" style={{ animationDelay: '0.1s' }}>
+            <button 
+              onClick={() => setStatusFilter('all')}
+              className={`px-4 py-2 rounded-full whitespace-nowrap text-[13px] font-semibold transition-all ${statusFilter === 'all' ? 'bg-text-primary text-bg-primary shadow-sm' : 'bg-bg-secondary text-text-muted hover:bg-bg-card-hover border border-border'}`}
+            >
+              Все
+            </button>
+            <button 
+              onClick={() => setStatusFilter('expired')}
+              className={`px-4 py-2 rounded-full whitespace-nowrap text-[13px] font-semibold transition-all ${statusFilter === 'expired' ? 'bg-status-red/10 text-status-red border border-status-red/30' : 'bg-bg-secondary text-text-muted hover:bg-bg-card-hover border border-border'}`}
+            >
+              🔴 Просрочены
+            </button>
+            <button 
+              onClick={() => setStatusFilter('expiring')}
+              className={`px-4 py-2 rounded-full whitespace-nowrap text-[13px] font-semibold transition-all ${statusFilter === 'expiring' ? 'bg-status-yellow/10 text-status-yellow border border-status-yellow/30' : 'bg-bg-secondary text-text-muted hover:bg-bg-card-hover border border-border'}`}
+            >
+              🟡 Скоро
+            </button>
+            <button 
+              onClick={() => setStatusFilter('valid')}
+              className={`px-4 py-2 rounded-full whitespace-nowrap text-[13px] font-semibold transition-all ${statusFilter === 'valid' ? 'bg-status-green/10 text-status-green border border-status-green/30' : 'bg-bg-secondary text-text-muted hover:bg-bg-card-hover border border-border'}`}
+            >
+              🟢 В норме
+            </button>
           </div>
         </div>
 
@@ -177,7 +226,7 @@ export default function HomePage() {
                   <polyline points="10 9 9 9 8 9"></polyline>
                 </svg>
               </div>
-              <p className="text-text-secondary font-medium">{searchQuery ? t.app.noResults : t.equipment.noCertificates}</p>
+              <p className="text-text-secondary font-medium">{searchQuery || statusFilter !== 'all' ? 'Ничего не найдено' : t.equipment.noCertificates}</p>
             </div>
           ) : (
             grouped.map((group) => (
@@ -216,15 +265,17 @@ export default function HomePage() {
         </div>
       </div>
 
-      <Link
-        href="/equipment/new"
-        className="fixed bottom-[100px] right-5 w-14 h-14 rounded-full bg-gradient-to-br from-accent to-[#8b5cf6] text-white flex items-center justify-center shadow-[0_4px_14px_rgba(99,102,241,0.4)] hover:shadow-[0_6px_20px_rgba(99,102,241,0.6)] animate-pulse-glow z-40 transition-all hover:-translate-y-0.5 active:scale-95"
-      >
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-      </Link>
+      {user?.role === 'admin' && (
+        <Link
+          href="/equipment/new"
+          className="fixed bottom-[100px] right-5 w-14 h-14 rounded-full bg-gradient-to-br from-accent to-[#8b5cf6] text-white flex items-center justify-center shadow-[0_4px_14px_rgba(99,102,241,0.4)] hover:shadow-[0_6px_20px_rgba(99,102,241,0.6)] animate-pulse-glow z-40 transition-all hover:-translate-y-0.5 active:scale-95"
+        >
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </Link>
+      )}
 
       <nav className="nav-dock-container">
         <div className="nav-dock">
@@ -234,12 +285,14 @@ export default function HomePage() {
             </svg>
             <span className="text-[10px] font-bold tracking-wide">{t.nav.home}</span>
           </Link>
-          <Link href="/verification-types" className="nav-item">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M4 6h16M4 12h16M4 18h7" />
-            </svg>
-            <span className="text-[10px] font-bold tracking-wide">{t.nav.types}</span>
-          </Link>
+          {user?.role === 'admin' && (
+            <Link href="/verification-types" className="nav-item">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 6h16M4 12h16M4 18h7" />
+              </svg>
+              <span className="text-[10px] font-bold tracking-wide">{t.nav.types}</span>
+            </Link>
+          )}
         </div>
       </nav>
     </>
@@ -277,9 +330,20 @@ function EquipmentCard({ item, language }: { item: EquipmentItem & { daysLeft: n
       className="block p-4 rounded-[20px] bg-bg-card hover:bg-bg-card-hover transition-all duration-200 border border-border hover:border-accent/30 hover:shadow-lg active:scale-95"
     >
       <div className="flex items-start gap-4">
-        <div className="mt-1 flex-shrink-0">
-          <span className={`status-dot ${dotClass}`} />
-        </div>
+        {item.photoUrl ? (
+          <div className="flex-shrink-0 relative">
+            <img 
+              src={item.photoUrl} 
+              alt={item.name} 
+              className="w-12 h-12 rounded-full object-cover border border-border shadow-sm"
+            />
+            <span className={`absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-bg-card ${dotClass.replace('status-', 'bg-status-')}`} />
+          </div>
+        ) : (
+          <div className="mt-1 flex-shrink-0">
+            <span className={`status-dot ${dotClass}`} />
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <h3 className="text-[15px] font-bold text-text-primary leading-tight line-clamp-2 mb-1">
             {item.name}

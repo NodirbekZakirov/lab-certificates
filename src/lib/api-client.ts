@@ -49,6 +49,7 @@ export interface EquipmentItem {
   expiryDate: string;
   certificateFileUrl: string | null;
   certificateFileType: string | null;
+  photoUrl: string | null;
   updatedAt: string;
   verificationTypeNameRu: string;
   verificationTypeNameUz: string;
@@ -84,6 +85,7 @@ export interface UserData {
   username: string | null;
   language: string;
   isAllowed: boolean;
+  role: string;
   notificationsEnabled: boolean;
 }
 
@@ -107,6 +109,7 @@ export const api = {
     expiryDate: string;
     certificateFileUrl?: string;
     certificateFileType?: string;
+    photoUrl?: string;
   }) =>
     apiFetch<EquipmentItem>('/api/equipment', {
       method: 'POST',
@@ -120,6 +123,7 @@ export const api = {
       expiryDate?: string;
       certificateFileUrl?: string;
       certificateFileType?: string;
+      photoUrl?: string;
     }
   ) =>
     apiFetch<EquipmentItem>(`/api/equipment/${id}`, {
@@ -142,4 +146,20 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+
+  // Audit Log
+  getAuditLogs: () => apiFetch<AuditLogItem[]>('/api/audit'),
 };
+
+export interface AuditLogItem {
+  id: string;
+  telegramId: number;
+  action: string;
+  entityType: string;
+  entityId: string;
+  entityName: string | null;
+  details: string | null;
+  createdAt: string;
+  userFirstName: string | null;
+  userUsername: string | null;
+}

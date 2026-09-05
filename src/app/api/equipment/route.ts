@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { equipment, verificationTypes } from '@/lib/db/schema';
+import { equipment, verificationTypes, auditLog } from '@/lib/db/schema';
 import { authenticateRequest, requireAllowed, authErrorResponse } from '@/lib/auth';
-import { eq, asc, sql } from 'drizzle-orm';
+import { eq, asc } from 'drizzle-orm';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
       expiryDate: equipment.expiryDate,
       certificateFileUrl: equipment.certificateFileUrl,
       certificateFileType: equipment.certificateFileType,
+      photoUrl: equipment.photoUrl,
       updatedAt: equipment.updatedAt,
       verificationTypeNameRu: verificationTypes.nameRu,
       verificationTypeNameUz: verificationTypes.nameUz,
@@ -50,8 +51,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Access denied' }, { status: 403 });
   }
 
+  if (auth.user.role !== 'admin') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
   const body = await request.json();
-  const { name, verificationTypeId, certificateNumber, expiryDate, certificateFileUrl, certificateFileType } = body;
+  const { name, verificationTypeId, certificateNumber, expiryDate, certificateFileUrl, certificateFileType, photoUrl } = body;
 
   if (!name || !verificationTypeId || !expiryDate) {
     return NextResponse.json(
@@ -69,9 +74,19 @@ export async function POST(request: NextRequest) {
       expiryDate,
       certificateFileUrl: certificateFileUrl || null,
       certificateFileType: certificateFileType || null,
+      photoUrl: photoUrl || null,
       updatedBy: auth.user.telegramId,
     })
     .returning();
+
+  await db.insert(auditLog).values({
+    telegramId: auth.user.telegramId,
+    action: 'CREATE',
+    entityType: 'equipment',
+    entityId: created.id,
+    entityName: created.name,
+    details: JSON.stringify(created),
+  });
 
   return NextResponse.json(created, { status: 201 });
 }

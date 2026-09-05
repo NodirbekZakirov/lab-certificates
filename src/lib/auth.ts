@@ -10,6 +10,7 @@ export interface AuthenticatedUser {
   username: string | null;
   language: string;
   isAllowed: boolean;
+  role: string;
   notificationsEnabled: boolean;
 }
 
@@ -45,6 +46,7 @@ export async function authenticateRequest(
           firstName: 'Admin (Dev)',
           username: 'admin',
           isAllowed: true,
+          role: 'admin',
         })
         .returning();
       user = created;
@@ -57,6 +59,7 @@ export async function authenticateRequest(
         username: user.username,
         language: user.language,
         isAllowed: user.isAllowed,
+        role: user.role,
         notificationsEnabled: user.notificationsEnabled,
       },
     };
@@ -91,13 +94,16 @@ export async function authenticateRequest(
       .map((id) => parseInt(id.trim(), 10))
       .filter((id) => !isNaN(id)) ?? [];
 
+    const isInitialAdmin = allowedIds.includes(validated.user.id);
+
     const rows = await db
       .insert(users)
       .values({
         telegramId: validated.user.id,
         firstName: validated.user.first_name || null,
         username: validated.user.username || null,
-        isAllowed: allowedIds.includes(validated.user.id),
+        isAllowed: isInitialAdmin,
+        role: isInitialAdmin ? 'admin' : 'viewer',
       })
       .returning();
     user = rows[0];
@@ -110,6 +116,7 @@ export async function authenticateRequest(
       username: user.username,
       language: user.language,
       isAllowed: user.isAllowed,
+      role: user.role,
       notificationsEnabled: user.notificationsEnabled,
     },
   };

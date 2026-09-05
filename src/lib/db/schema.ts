@@ -17,6 +17,7 @@ export const users = pgTable('users', {
   username: text('username'),
   language: text('language').notNull().default('ru'),
   isAllowed: boolean('is_allowed').notNull().default(false),
+  role: text('role').notNull().default('viewer'), // 'admin' | 'viewer'
   notificationsEnabled: boolean('notifications_enabled').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
@@ -41,6 +42,7 @@ export const equipment = pgTable('equipment', {
   expiryDate: date('expiry_date').notNull(),
   certificateFileUrl: text('certificate_file_url'),
   certificateFileType: text('certificate_file_type'), // 'image' | 'pdf'
+  photoUrl: text('photo_url'), // Фотография самого прибора
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
   updatedBy: bigint('updated_by', { mode: 'number' }).references(
@@ -80,3 +82,17 @@ export const sentNotifications = pgTable(
     ),
   ]
 );
+
+// ─── Audit Log (Журнал действий) ────────────────────────────────────────────
+export const auditLog = pgTable('audit_log', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  telegramId: bigint('telegram_id', { mode: 'number' })
+    .notNull()
+    .references(() => users.telegramId),
+  action: text('action').notNull(), // 'CREATE', 'UPDATE', 'DELETE'
+  entityType: text('entity_type').notNull(), // 'equipment', 'verification_type', 'user'
+  entityId: text('entity_id').notNull(),
+  entityName: text('entity_name').notNull(),
+  details: text('details'), // JSON string with details of changes
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});

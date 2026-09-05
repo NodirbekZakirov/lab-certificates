@@ -230,6 +230,35 @@ export default function SettingsPage() {
               </div>
             </div>
           )}
+
+          {/* Admin Section */}
+          {user?.role === 'admin' && (
+            <div className="glass-card p-6 animate-slide-up delay-500">
+              <h3 className="text-[15px] font-bold text-text-primary tracking-tight mb-4">
+                Администрирование
+              </h3>
+              <Link href="/audit" className="flex items-center justify-between p-4 rounded-xl bg-bg-secondary hover:bg-bg-card-hover transition-colors border border-border group active:scale-95 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                      <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-[14px] font-bold text-text-primary group-hover:text-accent transition-colors">Журнал действий</div>
+                    <div className="text-xs font-medium text-text-muted mt-0.5">История изменений в системе</div>
+                  </div>
+                </div>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-text-muted group-hover:text-accent transition-colors">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 

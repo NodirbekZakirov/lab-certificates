@@ -25,6 +25,7 @@ export default function EditEquipmentPage({
   const [expiryDate, setExpiryDate] = useState('');
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [fileType, setFileType] = useState<string | null>(null);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
@@ -40,6 +41,7 @@ export default function EditEquipmentPage({
       setExpiryDate(data.expiryDate);
       setFileUrl(data.certificateFileUrl);
       setFileType(data.certificateFileType);
+      setPhotoUrl(data.photoUrl);
     } catch (err) {
       console.error('Failed to load equipment:', err);
     } finally {
@@ -47,7 +49,7 @@ export default function EditEquipmentPage({
     }
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, fieldName: 'certificate' | 'photo') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -58,7 +60,10 @@ export default function EditEquipmentPage({
     }
 
     // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+    const allowedTypes = fieldName === 'photo' 
+      ? ['image/jpeg', 'image/png', 'image/webp']
+      : ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+
     if (!allowedTypes.includes(file.type)) {
       alert(t.validation.invalidFileType);
       return;
@@ -74,7 +79,7 @@ export default function EditEquipmentPage({
         body: JSON.stringify({
           type: 'blob.generate-client-token',
           payload: {
-            pathname: `certificates/${id}/${file.name}`,
+            pathname: `${fieldName}s/${id}/${file.name}`,
             callbackUrl: '/api/upload/blob-token',
             clientPayload: initData,
           },
@@ -95,20 +100,25 @@ export default function EditEquipmentPage({
       if (!uploadResponse.ok) throw new Error('Upload failed');
 
       const blob = await uploadResponse.json();
-      setFileUrl(blob.url);
-      setFileType(file.type.startsWith('image/') ? 'image' : 'pdf');
+      
+      if (fieldName === 'photo') {
+        setPhotoUrl(blob.url);
+      } else {
+        setFileUrl(blob.url);
+        setFileType(file.type.startsWith('image/') ? 'image' : 'pdf');
+      }
     } catch (err) {
       console.error('Upload error:', err);
       // Fallback: use simple upload via FormData
       try {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        // For now, convert to base64 data URL as fallback
         const reader = new FileReader();
         reader.onload = () => {
-          setFileUrl(reader.result as string);
-          setFileType(file.type.startsWith('image/') ? 'image' : 'pdf');
+          if (fieldName === 'photo') {
+            setPhotoUrl(reader.result as string);
+          } else {
+            setFileUrl(reader.result as string);
+            setFileType(file.type.startsWith('image/') ? 'image' : 'pdf');
+          }
         };
         reader.readAsDataURL(file);
       } catch {
@@ -134,6 +144,7 @@ export default function EditEquipmentPage({
         expiryDate,
         certificateFileUrl: fileUrl || undefined,
         certificateFileType: fileType || undefined,
+        photoUrl: photoUrl || undefined,
       });
       setSuccessMessage(t.equipment.updated);
       setTimeout(() => {
@@ -181,6 +192,39 @@ export default function EditEquipmentPage({
       )}
 
       <form onSubmit={handleSubmit} className="px-5 space-y-5 max-w-2xl mx-auto">
+        {/* Photo upload */}
+        <div className="animate-slide-up delay-100 flex flex-col items-center mb-6">
+          <label className="block text-[13px] font-semibold text-text-muted mb-3 uppercase tracking-wider text-center">Фотография прибора</label>
+          
+          <div className="relative mb-3 group">
+            {photoUrl ? (
+              <img src={photoUrl} alt="Equipment" className="w-24 h-24 rounded-full object-cover border-4 border-bg-secondary shadow-md" />
+            ) : (
+              <div className="w-24 h-24 rounded-full bg-bg-secondary flex items-center justify-center border-4 border-border shadow-sm">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-text-muted">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21 15 16 10 5 21" />
+                </svg>
+              </div>
+            )}
+            
+            <label className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-accent text-white flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-lg border-2 border-bg-primary">
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(e) => handleFileChange(e, 'photo')}
+                className="hidden"
+              />
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+            </label>
+          </div>
+        </div>
+
         {/* Name */}
         <div className="animate-slide-up delay-100">
           <label className="block text-[13px] font-semibold text-text-muted mb-2 ml-1 uppercase tracking-wider">{t.equipment.name}</label>
@@ -245,7 +289,7 @@ export default function EditEquipmentPage({
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp,application/pdf"
-              onChange={handleFileChange}
+              onChange={(e) => handleFileChange(e, 'certificate')}
               className="hidden"
             />
             <div className="flex flex-col items-center gap-3">
@@ -273,7 +317,7 @@ export default function EditEquipmentPage({
           <button
             type="submit"
             className="btn-primary w-full shadow-lg"
-            disabled={saving || !name || !expiryDate}
+            disabled={saving || !name || !expiryDate || uploading}
           >
             {saving ? (
               <div className="flex items-center justify-center gap-2">
